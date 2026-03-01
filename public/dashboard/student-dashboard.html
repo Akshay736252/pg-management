@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - PG Life Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            color: #1e293b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Premium Sidebar */
+        .sidebar {
+            width: 300px;
+            background: white;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+        }
+
+        .sidebar-header i {
+            font-size: 60px;
+            background: white;
+            color: #667eea;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .online-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 15px;
+            height: 15px;
+            background: #10b981;
+            border: 3px solid white;
+            border-radius: 50%;
+        }
+
+        .sidebar-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .sidebar-menu {
+            padding: 20px;
+        }
+
+        .menu-category {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin: 20px 0 10px 15px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover {
+            background: #f8fafc;
+            color: #667eea;
+            padding-left: 25px;
+        }
+
+        .menu-item:hover::before {
+            transform: translateX(0);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+
+        .menu-item.active::before {
+            display: none;
+        }
+
+        .menu-item i {
+            width: 22px;
+            font-size: 18px;
+        }
+
+        .menu-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        /* Premium Top Bar */
+        .top-bar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border: 1px solid rgba(102,126,234,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome h2 {
+            font-size: 24px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .welcome h2 span {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome p {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .notification:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .notification:hover i {
+            color: white;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 5px 15px;
+            background: #f8fafc;
+            border-radius: 40px;
+            transition: all 0.3s;
+        }
+
+        .profile:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .profile i {
+            font-size: 32px;
+            color: #667eea;
+            transition: all 0.3s;
+        }
+
+        .profile:hover i {
+            color: white;
+        }
+
+        .profile-info {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .profile-info {
+                display: block;
+            }
+            .profile-info h4 {
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .profile-info p {
+                font-size: 12px;
+                color: #64748b;
+            }
+            .profile:hover .profile-info p {
+                color: rgba(255,255,255,0.8);
+            }
+        }
+
+        /* Premium Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.4s;
+            border: 1px solid rgba(102,126,234,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102,126,234,0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(102,126,234,0.2);
+            border-color: #667eea;
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+            transition: all 0.4s;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .stat-icon i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .stat-info h3 {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-info .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .stat-info .sub {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-info .sub i {
+            font-size: 12px;
+            color: #10b981;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 25px;
+        }
+
+        /* Premium Cards */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid rgba(102,126,234,0.1);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 15px 30px rgba(102,126,234,0.15);
+            border-color: #667eea;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            color: #667eea;
+            font-size: 22px;
+        }
+
+        .view-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            background: #f0f4ff;
+            border-radius: 30px;
+        }
+
+        .view-link:hover {
+            background: #667eea;
+            color: white;
+            gap: 10px;
+        }
+
+        .view-link i {
+            font-size: 12px;
+        }
+
+        /* Premium Menu Grid */
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .menu-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .menu-card:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(102,126,234,0.4);
+            border-color: #667eea;
+        }
+
+        .menu-card i {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .menu-card:hover i {
+            color: white;
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .menu-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .menu-card p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Premium Menu Cards */
+        .meal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .meal-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 18px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .meal-card.special {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .meal-card:not(.special):hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+
+        .meal-time {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .meal-card:hover .meal-time {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .meal-card.special .meal-time {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .meal-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        .meal-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .meal-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* Premium Complaint Items */
+        .complaint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .complaint-item:hover {
+            background: white;
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.2);
+        }
+
+        .complaint-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .complaint-info p {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status {
+            padding: 6px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            transition: all 0.3s;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.progress {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        /* Premium Lost Items */
+        .lost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+            transition: all 0.3s;
+        }
+
+        .lost-item:hover {
+            background: white;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.15);
+            transform: translateX(5px);
+        }
+
+        .item-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .item-info p {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .claim-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(102,126,234,0.3);
+        }
+
+        .claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.5);
+        }
+
+        /* Premium Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .contact-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 18px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .contact-card:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(102,126,234,0.4);
+        }
+
+        .contact-card i {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover i {
+            color: white;
+            transform: scale(1.2);
+        }
+
+        .contact-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .contact-card p {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .contact-card .phone {
+            font-weight: 700;
+            font-size: 13px;
+            color: #667eea;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover .phone {
+            color: white;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s;
+            border-left: 4px solid;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.info {
+            border-left-color: #3b82f6;
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast.success i {
+            color: #10b981;
+        }
+
+        .toast.error i {
+            color: #ef4444;
+        }
+
+        .toast.info i {
+            color: #3b82f6;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .toast-content p {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .toast-close {
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.3s;
+        }
+
+        .toast-close:hover {
+            color: #1e293b;
+        }
+
+        /* Quick Stats Progress */
+        .progress-ring {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .progress-ring-circle {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle-bg {
+            stroke: #e2e8f0;
+            stroke-width: 4;
+            fill: transparent;
+        }
+
+        .progress-ring-circle-progress {
+            stroke: #667eea;
+            stroke-width: 4;
+            fill: transparent;
+            stroke-dasharray: 163;
+            stroke-dashoffset: 163;
+            transition: stroke-dashoffset 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .meal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.5);
+            z-index: 1000;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body.dark-mode {
+                background: #0f172a;
+                color: #e2e8f0;
+            }
+            
+            .dark-mode .sidebar,
+            .dark-mode .card,
+            .dark-mode .top-bar {
+                background: #1e293b;
+                border-color: #334155;
+            }
+            
+            .dark-mode .menu-card,
+            .dark-mode .complaint-item,
+            .dark-mode .lost-item,
+            .dark-mode .contact-card {
+                background: #334155;
+            }
+            
+            .dark-mode .stat-info .value,
+            .dark-mode .card-header h3,
+            .dark-mode .welcome h2 {
+                color: #f1f5f9;
+            }
+            
+            .dark-mode .stat-info h3,
+            .dark-mode .welcome p {
+                color: #94a3b8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="avatar-container">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="online-badge"></span>
+                </div>
+                <h3 id="studentName">Rahul Sharma</h3>
+                <p id="studentRoom">Room 101 • Bed A</p>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-category">Main</div>
+                <a href="#" class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-utensils"></i>
+                    <span>Mess Menu</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Complaints</span>
+                    <span class="menu-badge">2</span>
+                </a>
+                
+                <div class="menu-category">Services</div>
+                <a href="" class="menu-item">
+                    <i class="fas fa-box"></i>
+                    <span>Lost & Found</span>
+                </a>
+                <a href="" class="menu-item">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payments</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Contact</span>
+                </a>
+                
+                <div class="menu-category">Account</div>
+                <a href="#" class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="welcome">
+                    <h2>Welcome back, <span id="welcomeName">Akshay</span>!</h2>
+                    <p><i class="far fa-calendar-alt"></i> <span id="currentDate"></span></p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="showToast('info', 'New Updates', 'You have 3 new notifications')">
+                        <i class="far fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="profile">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="profile-info">
+                            <h4 id="profileName">Akshay Kanojia</h4>
+                            <p>Student • Room 15</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Room Details</h3>
+                        <div class="value" id="roomDetails">15 - A</div>
+                        <div class="sub"><i class="fas fa-layer-group"></i> 2nd Floor</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Rent Due</h3>
+                        <div class="value" id="rentAmount">₹8,500</div>
+                        <div class="sub" id="dueDate"><i class="far fa-clock"></i> Due in 15 days</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Complaints</h3>
+                        <div class="value" id="complaintCount">2</div>
+                        <div class="sub"><i class="fas fa-spinner"></i> 1 In Progress</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Days Left</h3>
+                        <div class="value" id="daysLeft">15</div>
+                        <div class="sub"><i class="fas fa-hourglass-half"></i> for next rent</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Today's Menu Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-utensils"></i> Today's Special Menu</h3>
+                            <a href="/src/app/student/mess-menu/" class="view-link">View Full <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        <div class="meal-grid">
+                            <div class="meal-card">
+                                <div class="meal-time">BREAKFAST</div>
+                                <div class="meal-value">8:00</div>
+                                <div class="meal-name">Aloo Paratha</div>
+                                <span class="meal-badge">Fresh</span>
+                            </div>
+                            <div class="meal-card">
+                                <div class="meal-time">LUNCH</div>
+                                <div class="meal-value">12:30</div>
+                                <div class="meal-name">Chole Bhature</div>
+                                <span class="meal-badge">Special</span>
+                            </div>
+                            <div class="meal-card special">
+                                <div class="meal-time">DINNER</div>
+                                <div class="meal-value">7:30</div>
+                                <div class="meal-name">Paneer Masala</div>
+                                <span class="meal-badge">⭐ Sunday Special</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                        </div>
+                        <div class="menu-items">
+                            <div class="menu-card" onclick="showToast('info', 'Raise Complaint', 'Opening complaint form...')">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <h4>Raise Complaint</h4>
+                                <p>Report an issue</p>
+                            </div>
+                            <div class="menu-card" onclick="showToast('info', 'Payment', 'Redirecting to payment...')">
+                                <i class="fas fa-credit-card"></i>
+                                <h4>Pay Rent</h4>
+                                <p>Clear your dues</p>
+                            </div>
+                            <div class="menu-card" onclick="showToast('info', 'Lost & Found', 'Opening lost items...')">
+                                <i class="fas fa-box"></i>
+                                <h4>Lost & Found</h4>
+                                <p>Check lost items</p>
+                            </div>
+                            <div class="menu-card" onclick="showToast('info', 'Contact', 'Opening contacts...')">
+                                <i class="fas fa-phone"></i>
+                                <h4>Contact</h4>
+                                <p>Owner/Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <!-- Recent Complaints -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-exclamation-circle"></i> Recent Complaints</h3>
+                            <a href="#" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        <div id="complaintsList">
+                            <div class="complaint-item">
+                                <div class="complaint-info">
+                                    <h4>Fan not working</h4>
+                                    <p><i class="far fa-clock"></i> 2 days ago • Room 15</p>
+                                </div>
+                                <span class="status progress">In Progress</span>
+                            </div>
+                            <div class="complaint-item">
+                                <div class="complaint-info">
+                                    <h4>WiFi issue</h4>
+                                    <p><i class="far fa-clock"></i> 3 days ago • Room 15</p>
+                                </div>
+                                <span class="status resolved">Resolved</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lost & Found -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-box"></i> Lost & Found</h3>
+                            <a href="#" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        <div id="lostItems">
+                            <div class="lost-item">
+                                <div class="item-info">
+                                    <h4>Black Water Bottle</h4>
+                                    <p><i class="fas fa-map-marker-alt"></i> Dining Hall</p>
+                                </div>
+                                <button class="claim-btn" onclick="showToast('success', 'Claim Requested', 'Owner will be notified')">Claim</button>
+                            </div>
+                            <div class="lost-item">
+                                <div class="item-info">
+                                    <h4>Physics Book</h4>
+                                    <p><i class="fas fa-map-marker-alt"></i> Study Room</p>
+                                </div>
+                                <button class="claim-btn" onclick="showToast('success', 'Claim Requested', 'Owner will be notified')">Claim</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-phone-alt"></i> Important Contacts</h3>
+                        </div>
+                        <div class="contact-grid">
+                            <div class="contact-card">
+                                <i class="fas fa-user-tie"></i>
+                                <h4>Owner</h4>
+                                <p>Mr. Verma</p>
+                                <p class="phone">+91 98765 43210</p>
+                            </div>
+                            <div class="contact-card">
+                                <i class="fas fa-user-cog"></i>
+                                <h4>Manager</h4>
+                                <p>Mr. Singh</p>
+                                <p class="phone">+91 98765 43211</p>
+                            </div>
+                            <div class="contact-card">
+                                <i class="fas fa-shield-alt"></i>
+                                <h4>Security</h4>
+                                <p>24/7 Helpline</p>
+                                <p class="phone">+91 98765 43212</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user data
+        const userData = JSON.parse(localStorage.getItem('pgUser') || '{}');
+        const token = localStorage.getItem('pgToken');
+
+        // Show loading spinner
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').classList.toggle('show', show);
+        }
+
+        // Toast notification system
+        function showToast(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = '';
+            if (type === 'success') icon = 'fa-check-circle';
+            else if (type === 'error') icon = 'fa-exclamation-circle';
+            else icon = 'fa-info-circle';
+            
+            toast.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <div class="toast-content">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                </div>
+                <i class="fas fa-times toast-close"></i>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            }, 3000);
+            
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            });
+        }
+
+        // Redirect if not logged in
+        if (!token) {
+            showLoading(true);
+            setTimeout(() => {
+                window.location.href = '/login/student-login.html';
+            }, 1000);
+        }
+
+        // Update UI with user data
+        document.getElementById('studentName').textContent = userData.name || 'Akshay Kanojia';
+        document.getElementById('welcomeName').textContent = (userData.name || 'Akshay').split(' ')[0];
+        document.getElementById('profileName').textContent = userData.name || 'Akshay Kanojia';
+        document.getElementById('studentRoom').textContent = `Room ${userData.roomNo || '15'} • Bed A`;
+        document.getElementById('roomDetails').textContent = `${userData.roomNo || '15'} - A`;
+        document.getElementById('rentAmount').textContent = '₹8,500';
+        document.getElementById('dueDate').innerHTML = '<i class="far fa-clock"></i> Due on 05 Apr 2024';
+
+        // Set current date
+        const date = new Date();
+        document.getElementById('currentDate').textContent = date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            menuToggle.innerHTML = sidebar.classList.contains('open') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            }
+        });
+
+        // Logout with animation
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading(true);
+            
+            setTimeout(() => {
+                localStorage.removeItem('pgToken');
+                localStorage.removeItem('pgUser');
+                window.location.href = '/login/student-login.html';
+            }, 1000);
+        });
+
+        // Welcome toast on load
+        setTimeout(() => {
+            showToast('success', 'Welcome Back!', `Good to see you, ${userData.name || 'Rahul'}`);
+        }, 500);
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const hours = new Date().getHours();
+            if (hours === 8 || hours === 12 || hours === 19) {
+                showToast('info', 'Meal Time!', 'Check today\'s special menu');
+            }
+        }, 60000); // Check every minute
+
+        // Progress ring animation (for future use)
+        function setProgress(percent) {
+            const circle = document.querySelector('.progress-ring-circle-progress');
+            if (circle) {
+                const radius = 26;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (percent / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+            }
+        }
+    </script>
+</body>
+</html>
